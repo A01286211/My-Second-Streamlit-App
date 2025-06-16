@@ -1,4 +1,6 @@
 import streamlit as st
+import zipfile
+import os
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import matplotlib.pyplot as plt
@@ -8,27 +10,39 @@ import numpy as np
 from wordcloud import WordCloud
 import plotly.express as px
 
-# Load models and tokenizer
+# Paths
+MODEL_ZIP_PATHS = {
+    "DistilBERT": "models/distilbert_model.zip",
+    "BERT": "models/bert.zip",
+    "RoBERTa": "models/roberta.zip"
+}
+MODEL_EXTRACT_PATHS = {
+    "DistilBERT": "/tmp/distilbert_model",
+    "BERT": "/tmp/bert_model",
+    "RoBERTa": "/tmp/roberta_model"
+}
+
+# Extract and load models
 @st.cache_resource
 def load_models():
-    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-    model_1 = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
-    model_2 = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
-    model_3 = AutoModelForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)
+    models = {}
+    for name, zip_path in MODEL_ZIP_PATHS.items():
+        extract_path = MODEL_EXTRACT_PATHS[name]
 
-    model_1.load_state_dict(torch.load("model_1.pth", map_location=torch.device('cpu')))
-    model_2.load_state_dict(torch.load("model_2.pth", map_location=torch.device('cpu')))
-    model_3.load_state_dict(torch.load("model_3.pth", map_location=torch.device('cpu')))
+        if not os.path.exists(extract_path):
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(extract_path)
 
-    model_1.eval()
-    model_2.eval()
-    model_3.eval()
+        tokenizer = AutoTokenizer.from_pretrained(extract_path)
+        model = AutoModelForSequenceClassification.from_pretrained(extract_path)
+        model.eval()
+        models[name] = (tokenizer, model)
+    return models
 
-    return tokenizer, model_1, model_2, model_3
+models = load_models()
 
-tokenizer, model_1, model_2, model_3 = load_models()
-
-def predict(text, model):
+# Prediction function
+def predict(text, model, tokenizer):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
     with torch.no_grad():
         outputs = model(**inputs)
@@ -38,7 +52,7 @@ def predict(text, model):
 
 st.set_page_config(page_title="Fake News Classifier", layout="wide")
 
-# Sidebar for navigation
+# Navigation
 page = st.sidebar.selectbox("Choose a page:", [
     "Inference Interface",
     "Dataset Visualization",
@@ -50,11 +64,11 @@ page = st.sidebar.selectbox("Choose a page:", [
 if page == "Inference Interface":
     st.title("Fake News Detection")
     user_input = st.text_area("Enter text to classify:")
-    selected_model = st.selectbox("Choose a model:", ["Model 1", "Model 2", "Model 3"])
+    selected_model = st.selectbox("Choose a model:", list(models.keys()))
 
     if st.button("Classify") and user_input:
-        model = {"Model 1": model_1, "Model 2": model_2, "Model 3": model_3}[selected_model]
-        label, scores = predict(user_input, model)
+        tokenizer, model = models[selected_model]
+        label, scores = predict(user_input, model, tokenizer)
         st.markdown(f"**Prediction:** {'Fake News' if label == 1 else 'Real News'}")
         st.markdown("**Confidence Scores:**")
         st.json({"Real News": float(scores[0]), "Fake News": float(scores[1])})
@@ -62,9 +76,7 @@ if page == "Inference Interface":
 # Page 2: Dataset Visualization
 elif page == "Dataset Visualization":
     st.title("Dataset Visualization")
-    # Replace with actual dataset
-    # df = pd.read_csv('your_dataset.csv')
-    # Plot class distribution, token lengths, word cloud, etc.
+    # COMMENT: Replace below with actual dataset loading and visualization
     st.markdown("## Class Distribution")
     # st.bar_chart(df['label'].value_counts())
 
@@ -89,42 +101,32 @@ elif page == "Dataset Visualization":
 elif page == "Hyperparameter Tuning":
     st.title("Hyperparameter Tuning")
     st.markdown("## Optimization Process")
-    # Include Optuna or Keras Tuner visualizations or screenshots here
-    # Example:
-    # st.image("optuna_study_plot.png")
+    # COMMENT: Insert visualizations or screenshots from Optuna/KerasTuner
+    # st.image("images/optuna_plot.png")
 
     st.markdown("## Tuned Parameters")
-    # st.write({"learning_rate": 2e-5, "batch_size": 32, "dropout_rate": 0.3})
+    # st.write({\"learning_rate\": 2e-5, \"batch_size\": 32, \"dropout_rate\": 0.3})
 
     st.markdown("## Performance Over Trials")
-    # Include a line plot of performance (e.g., F1-score) across trials
+    # COMMENT: Line plot showing F1-score over tuning steps
 
 # Page 4: Model Analysis and Justification
 elif page == "Model Analysis and Justification":
     st.title("Model Analysis and Justification")
     st.markdown("### Dataset Challenges")
-    # Write about class imbalance, multilinguality, etc.
+    # COMMENT: Discuss imbalance, noise, multilinguality, etc.
 
     st.markdown("### Prior Work")
-    # Cite relevant papers or Kaggle solutions
+    # COMMENT: Cite relevant research papers or Kaggle solutions
 
     st.markdown("### Why Our Model?")
-    # Justify choice of model architecture
+    # COMMENT: Justify architecture choice like DistilBERT, RoBERTa, etc.
 
     st.markdown("### Classification Report")
-    # from sklearn.metrics import classification_report
-    # y_true, y_pred = ...
-    # report = classification_report(y_true, y_pred, output_dict=True)
-    # st.json(report)
+    # COMMENT: Insert classification report via sklearn
 
     st.markdown("### Confusion Matrix")
-    # from sklearn.metrics import confusion_matrix
-    # cm = confusion_matrix(y_true, y_pred)
-    # fig, ax = plt.subplots()
-    # sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax)
-    # st.pyplot(fig)
+    # COMMENT: Include confusion matrix visualization
 
     st.markdown("### Error Analysis")
-    # st.write("False Positives and False Negatives Examples")
-    # st.write(df[(y_pred != y_true)].head())
-    # Discuss patterns and suggestions for improvement
+    # COMMENT: Show false positives/negatives and improvement suggestions
