@@ -1,0 +1,9 @@
+transformers
+torch
+streamlit
+matplotlib
+seaborn
+pandas
+plotly
+wordcloud
+gdown
