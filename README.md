@@ -95,7 +95,7 @@ streamlit run streamlit_app.py
 
 ## 👤 Author
 
-Developed by **[A01286211](https://github.com/A01286211)**  
+Developed by **[Sebastián Zaragoza](https://github.com/A01286211)**  
 For educational and demonstration purposes.
 
 ---
