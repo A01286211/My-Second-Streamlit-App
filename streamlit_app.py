@@ -71,23 +71,23 @@ elif page == "Dataset Visualization":
     st.title("Dataset Visualization")
     
     st.subheader("Class Distribution")
-    st.image("images/class_distribution.png", use_column_width=True)
+    st.image("images/class_distribution.png", use_container_width=True)
 
     st.markdown("The Class Distribution histogram shows a fairly balanced dataset, with about a 1000 entries separating both labels")
 
     st.subheader("Token Length Histogram")
-    st.image("images/token_lengths.png", use_column_width=True)
+    st.image("images/token_lengths.png", use_container_width=True)
 
     st.markdown("The token length distribution chart, shows that the vast majority of entries are within the [0,1000] token length range.")
 
     st.subheader("Word Cloud")
-    st.image("images/wordcloud.png", use_column_width=True)
+    st.image("images/wordcloud.png", use_container_width=True)
 
     st.markdown("The word cloud for fake news exhibits the most common words found within the entries labeled as fake news. It allows for an ambiguous idea of what a fake news article may be about.")
 
     st.subheader("Noisy or Ambiguous Text Examples")
     st.markdown("Some example classified as ambiguous texts are:n\' [TITLE] aig quadruples limits for terrorism insurance to  billion [TEXT] part  religious fraud httpswwwyoutubecomwatchvqutkbhprbls'\n' [TITLE] no title [TEXT] in obamaland'\n' [TITLE] no title [TEXT] draining the swamp  youtubecomwatchvotakuaoi'\n' [TITLE] no title [TEXT] jamie gorelick call your office'\n' [TITLE] no title [TEXT] stolen but factual just shows how crooked they are'")
-    st.markdown("It's notices that most of these present links to some other site, or are of too little length to be of great training/test usage.")
+    st.markdown("It's noticed that most of these present links to some other site, or are of too little length to be of great training/test usage.")
 
 elif page == "Hyperparameter Tuning":
     st.title("Hyperparameter Tuning")
@@ -115,29 +115,29 @@ elif page == "Model Analysis and Justification":
     st.header("DistilBERT Performance Analysis")
 
     st.subheader("Classification Report")
-    st.image("images/distilbert_classificationreport.png", use_column_width=True)
+    st.image("images/distilbert_classificationreport.png", use_container_width=True)
     
     st.subheader("Confusion Matrix")
-    st.image("images/distilbert_confusionmatrix.png", use_column_width=True)
+    st.image("images/distilbert_confusionmatrix.png", use_container_width=True)
 
     st.markdown("The classification report for the DistilBERT model, presented a high accuracy and f1-score, with both being estimated at 0.98. Plus, the confusion matrix shows a very high number of True Positives and True Negatives, with only 158 total entries classified incorrectly.")
 
     st.header("BERT Performance Analysis")
 
     st.subheader("Classification Report")
-    st.image("images/bert_classificationreport.png", use_column_width=True)
+    st.image("images/bert_classificationreport.png", use_container_width=True)
     
     st.subheader("Confusion Matrix")
-    st.image("images/bert_confusionmatrix.png", use_column_width=True)
+    st.image("images/bert_confusionmatrix.png", use_container_width=True)
 
     st.markdown("The classification report for the BERT model, exposed the accuracy close to a random classifier achieved by this model, and the confusion matrix fully uncovered the problem, this model classified every entry as a fake news article. The latter, could've possibly been caused by using the same batch_size as the DistilBERT, as bigger models tend to need bigger batch sizes.")
 
     st.header("RoBERTa Performance Analysis")
 
     st.subheader("Classification Report")
-    st.image("images/roberta_classificationreport.png", use_column_width=True)
+    st.image("images/roberta_classificationreport.png", use_container_width=True)
     
     st.subheader("Confusion Matrix")
-    st.image("images/roberta_confusionmatrix.png", use_column_width=True)
+    st.image("images/roberta_confusionmatrix.png", use_container_width=True)
 
     st.markdown("RoBERTa presented the same symptoms as BERT, though this time, all entries were classified as real news articles. The cause for the problem could also be in the batch_size parameter, or maybe even in the limited epochs used for training")
